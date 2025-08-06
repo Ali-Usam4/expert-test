@@ -1,23 +1,17 @@
-# 🐞 Bug Report & Fixes (July 2024)
+# 🐞 Bug Report & Fix Summary (July 2024)
 
-## Summary
-This project was reviewed for bugs in the Supabase functions, database schema, and frontend network calls. Below is a summary of the issues found and the fixes applied:
+## Issues Found & Fixed
 
-### Bugs Found & Fixed
-- **Supabase Function (`send-confirmation/index.ts`)**
-  - **Bug:** The OpenAI API response was accessed at `choices[1]` instead of `choices[0]`, causing most emails to have missing personalized content.
-    - **Fix:** Changed to use `choices[0]` for the first (and only) response.
-  - **Bug:** Missing validation for required environment variables (`OPENAI_API_KEY`, `RESEND_PUBLIC_KEY`).
-    - **Fix:** Added checks to throw clear errors if these are missing.
-- **Frontend (`LeadCaptureForm.tsx`)**
-  - **Bug:** The form called the `send-confirmation` function twice, resulting in duplicate emails for each submission.
-    - **Fix:** Removed the duplicate call; now only one email is sent per submission.
-- **Database Schema**
-  - No issues found. The schema matches the frontend fields and supports the required functionality.
+### 1. Supabase Function (send-confirmation)
+- **Bug:** The OpenAI API response was accessed at `choices[1]` instead of `choices[0]`, causing most emails to have missing personalized content.
+- **Fix:** Changed to use `choices[0]` for correct content extraction.
 
-### Comments
-- The frontend currently does not save leads to the database; it only sends a confirmation email. If you want to store leads, add a call to insert into the `leads` table via Supabase.
-- All changes have been linted and verified.
+### 2. Frontend (LeadCaptureForm)
+- **Bug:** The confirmation email was sent twice for every form submission due to a duplicate call to `supabase.functions.invoke('send-confirmation', ...)`.
+- **Fix:** Removed the duplicate call; now only one email is sent per submission.
+
+### 3. Database Schema
+- The schema and migrations for the `leads` table, including the `industry` column, were correct and required no changes.
 
 ---
 

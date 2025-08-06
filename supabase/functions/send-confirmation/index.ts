@@ -2,17 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
-const resendApiKey = Deno.env.get("RESEND_PUBLIC_KEY");
-const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
-
-if (!resendApiKey || resendApiKey === "invalid_key") {
-  throw new Error("RESEND_PUBLIC_KEY environment variable is missing or invalid.");
-}
-if (!openaiApiKey) {
-  throw new Error("OPENAI_API_KEY environment variable is missing.");
-}
-
-const resend = new Resend(resendApiKey);
+const resend = new Resend(Deno.env.get("RESEND_PUBLIC_KEY") || "invalid_key");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -31,7 +21,7 @@ const generatePersonalizedContent = async (name: string, industry: string) => {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -52,8 +42,7 @@ const generatePersonalizedContent = async (name: string, industry: string) => {
     });
 
     const data = await response.json();
-    // Fix: Use index 0 for the first choice
-    return data?.choices?.[0]?.message?.content;
+    return data?.choices[0]?.message?.content;
   } catch (error) {
     console.error('Error generating personalized content:', error);
     // Fallback content
