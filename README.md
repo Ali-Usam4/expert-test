@@ -1,3 +1,22 @@
+# Bug Report & Fix Summary (July 2024)
+
+## Issues Found & Fixes Applied
+
+### 1. Supabase Function (`send-confirmation/index.ts`)
+- **Bug:** The function used `data?.choices[1]?.message?.content` to extract the OpenAI response, but the correct index is `0`. This caused most emails to have missing personalized content.
+- **Fix:** Changed to `data?.choices[0]?.message?.content`.
+
+### 2. Frontend (`LeadCaptureForm.tsx`)
+- **Bug:** The form called the `send-confirmation` Supabase function twice, resulting in duplicate emails for every submission.
+- **Fix:** Removed the duplicate call; now only one confirmation email is sent per submission.
+- **Bug:** The frontend did not save leads to the database, only sent emails.
+- **Fix:** Added a call to insert the lead into the `leads` table in Supabase before sending the confirmation email.
+
+### 3. Database Schema
+- The schema and policies for the `leads` table were correct and required no changes.
+
+---
+
 # Welcome to your Lovable project
 
 ## Project info

@@ -27,7 +27,24 @@ export const LeadCaptureForm = () => {
 
     if (errors.length === 0) {
       // Save to database
-try {
+      try {
+        const { error: dbError } = await supabase.from('leads').insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            industry: formData.industry,
+          },
+        ]);
+        if (dbError) {
+          console.error('Error saving lead to database:', dbError);
+        } else {
+          console.log('Lead saved to database successfully');
+        }
+      } catch (dbError) {
+        console.error('Error inserting lead:', dbError);
+      }
+
+      try {
   const { error: emailError } = await supabase.functions.invoke('send-confirmation', {
     body: {
       name: formData.name,
@@ -44,25 +61,6 @@ try {
 } catch (emailError) {
   console.error('Error calling email function:', emailError);
 }
-
-      // Send confirmation email
-      try {
-        const { error: emailError } = await supabase.functions.invoke('send-confirmation', {
-          body: {
-            name: formData.name,
-            email: formData.email,
-            industry: formData.industry,
-          },
-        });
-
-        if (emailError) {
-          console.error('Error sending confirmation email:', emailError);
-        } else {
-          console.log('Confirmation email sent successfully');
-        }
-      } catch (emailError) {
-        console.error('Error calling email function:', emailError);
-      }
 
       const lead = {
         name: formData.name,
